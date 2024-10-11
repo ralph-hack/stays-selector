@@ -7,10 +7,13 @@ function processAccommodations(data) {
     const pricingQuote = result.pricingQuote
     const primaryLine = pricingQuote.structuredStayDisplayPrice.primaryLine
     const priceAsString = (primaryLine.price ?? primaryLine.discountedPrice).replace('$', '')
+    const avgRatingAsString = listing.avgRatingLocalized
+    const avgRatingAsFloat = parseFloat(avgRatingAsString.split()[0])
     const accommodation = {
       title: listing.title,
       price: parseFloat(priceAsString),
-      reviewRating: parseFloat(listing.avgRatingLocalized.split()[0]),
+      reviewRating: isNaN(avgRatingAsFloat)?null:avgRatingAsFloat,
+      reviewRatingAsString: avgRatingAsString
     };
     console.log('accommodation ===> ',accommodation)
     accommodations.push(accommodation);
@@ -29,10 +32,12 @@ function processAccommodations(data) {
   const groupedAccommodations = {};
   for (const accommodation of accommodations) {
     const reviewRating = accommodation.reviewRating;
-    if (!groupedAccommodations[reviewRating]) {
-      groupedAccommodations[reviewRating] = [];
+    const reviewRatingAsSting = accommodation.reviewRatingAsString
+    const key = reviewRating ?? reviewRatingAsSting
+    if (!groupedAccommodations[key]) {
+      groupedAccommodations[key] = [];
     }
-    groupedAccommodations[reviewRating].push(accommodation);
+    groupedAccommodations[key].push(accommodation);
   }
 
   return groupedAccommodations;
