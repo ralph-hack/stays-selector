@@ -2,14 +2,17 @@ const fs = require('fs');
 
 function processAccommodations(data) {
   const accommodations = [];
-
-  for (const result of data.niobeMinimalClientData[1].data.presentation.staysSearch.searchResults) {
+  for (const result of data.niobeMinimalClientData[0][1].data.presentation.staysSearch.results.searchResults) {
     const listing = result.listing;
+    const pricingQuote = result.pricingQuote
+    const primaryLine = pricingQuote.structuredStayDisplayPrice.primaryLine
+    const priceAsString = (primaryLine.price ?? primaryLine.discountedPrice).replace('$', '')
     const accommodation = {
       title: listing.title,
-      price: parseFloat(listing.pricingQuote.structuredStayDisplayPrice.primaryLine.price.replace('$', '')),
+      price: parseFloat(priceAsString),
       reviewRating: parseFloat(listing.avgRatingLocalized.split()[0]),
     };
+    console.log('accommodation ===> ',accommodation)
     accommodations.push(accommodation);
   }
 
