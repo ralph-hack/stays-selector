@@ -9,11 +9,13 @@ function processAccommodations(data) {
     const priceAsString = (primaryLine.price ?? primaryLine.discountedPrice).replace('$', '')
     const avgRatingAsString = listing.avgRatingLocalized
     const avgRatingAsFloat = parseFloat(avgRatingAsString.split()[0])
+    const listingUrl = `https://www.airbnb.com/rooms/${listing.id}`
     const accommodation = {
       title: listing.title,
       price: parseFloat(priceAsString),
       reviewRating: isNaN(avgRatingAsFloat)?null:avgRatingAsFloat,
-      reviewRatingAsString: avgRatingAsString
+      reviewRatingAsString: avgRatingAsString,
+      url: listingUrl
     };
     console.log('accommodation ===> ',accommodation)
     accommodations.push(accommodation);
@@ -58,7 +60,7 @@ fs.readFile('accommodations.json', 'utf8', (err, data) => {
     for (const score in groupedData) {
       console.log(`Review Score: ${score}`);
       for (const accommodation of groupedData[score]) {
-        console.log(`\t- ${accommodation.title}: $${accommodation.price}`);
+        console.log(`\t- ${accommodation.title}: $${accommodation.price} ${accommodation.url}`);
       }
     }
   } catch (error) {
