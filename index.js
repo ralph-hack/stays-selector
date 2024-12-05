@@ -3,11 +3,12 @@ const fs = require('fs');
 function processAccommodations(data) {
   const accommodations = [];
   for (const result of data.niobeMinimalClientData[0][1].data.presentation.staysSearch.results.searchResults) {
+    //console.log(result)
     const listing = result.listing;
     const pricingQuote = result.pricingQuote
     const primaryLine = pricingQuote.structuredStayDisplayPrice.primaryLine
     const priceAsString = (primaryLine.price ?? primaryLine.discountedPrice).replace('$', '')
-    const avgRatingAsString = listing.avgRatingLocalized
+    const avgRatingAsString = result.avgRatingLocalized
     const avgRatingAsFloat = parseFloat(avgRatingAsString.split()[0])
     const listingUrl = `https://www.airbnb.com/rooms/${listing.id}`
     const accommodation = {
