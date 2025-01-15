@@ -1,8 +1,8 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const staggered = [5,10,30]
-const checkin = '2025-01-19'
-const checkout = '2025-01-22'
+const checkin = '2025-01-26'
+const checkout = '2025-01-29'
 const dateRange = `${formatDate(checkin)} - ${formatDate(checkout)}`
 const guests = '1'
 const adults = '1'
@@ -17,8 +17,8 @@ const specificQuery = `?${findParams}&${bookingParams}`
 const flexibleQuery = `?${findParams}&${bookingParams}&${flexibleDatesParam}`
 const looseQuery = ''
 //const query = flexibleQuery
-const query = specificQuery
- //const query = looseQuery
+//const query = specificQuery
+ const query = looseQuery
 const NO_RANK = -125;
 
 async function extractAccommodations(  
@@ -866,6 +866,15 @@ async function fetchAmenitiesAndTotalPrice(url
   //  ,browser
   ) {
     const url = `https://www.airbnb.com/s/${city}--Colombia/homes${query}`;
+    return await getAccommodations(city, url
+      //, browser
+    );
+  }
+
+  async function getAccommodations(city, url, 
+    // browser
+  )
+  {
     const browser = await puppeteer.launch({
       ignoreCertificateErrors: true, // Bypass certificate verification
     });
@@ -1301,6 +1310,22 @@ fs.readFile(`${city}.json`, 'utf8', (err, data) => {
     processAccommodationUrls(accomUrls,whichLinks)
   }
 
+  function main3(){
+    const city = 'Ibague';
+    const url = 'https://www.airbnb.com/s/Ibagu%C3%A9--Tolima--Colombia/homes?refinement_paths%5B%5D=%2Fhomes&flexible_trip_lengths%5B%5D=one_week&price_filter_input_type=0&channel=EXPLORE&query=Ibagu%C3%A9%2C%20Tolima%2C%20Colombia&place_id=ChIJw4N9lwnEOI4RjnG5Vu4_b-E&date_picker_type=calendar&source=structured_search_input_header&search_type=user_map_move&monthly_start_date=2025-02-01&monthly_length=3&monthly_end_date=2025-05-01&search_mode=regular_search&disable_auto_translation=true&price_filter_num_nights=5&ne_lat=4.524602466779487&ne_lng=-75.1289470499969&sw_lat=4.322800029371973&sw_lng=-75.2831432331482&zoom=12.264138084243688&zoom_level=12.264138084243688&search_by_map=true'
+    getAccommodations(city,url).then((groupedData) => {
+         // Print the grouped data (optional)
+         for (const score in groupedData) {
+          console.log(`Review Score: ${score}`);
+          for (const accommodation of groupedData[score]) {
+            console.log(`\t- ${accommodation.title}: $${accommodation.totalPrice} ${accommodation.url}  Rank: ${accommodation.rank} Score:${accommodation.totalScore}`);
+          }
+        }
+
+        console.log(`Processing url completed.`);
+    });
+  }
+
   function main() {
     //const city = "El-Poblado";
     //const city = "Laureles"; 
@@ -1488,7 +1513,7 @@ fs.readFile(`${city}.json`, 'utf8', (err, data) => {
 
 
         //const cities = readAndPrintCities();
-        const cities = ['Bucaramanga']
+        const cities = ['Belen']
         processCities(cities);
       
         
@@ -1865,7 +1890,7 @@ function readAndPrintCities() {
             .filter(city => city !== ''); // Filter out empty lines
 }
 
-  main();
+  main3();
 
 // function processAmenities(json) {
 //   const amenities = {};

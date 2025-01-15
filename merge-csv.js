@@ -107,7 +107,8 @@ async function mergeCSVs(files, outputFile, options = {}) {
       const defaultOptions = {
         delimiter: ',', 
         from_line: 1, 
-        columns: true 
+        columns: true ,
+        relax_column_count: true 
       };
       const mergedOptions = { ...defaultOptions, ...options };
   
@@ -122,6 +123,7 @@ async function mergeCSVs(files, outputFile, options = {}) {
             fs.createReadStream(file)
                 .pipe(parse(mergedOptions))
                 .on('data', (row) => {
+                 // console.log('data received')
                 Object.keys(row).forEach(col =>{
                     allColumns.add(col);
                 });
@@ -206,7 +208,7 @@ console.log('all columns',allColumns.values());
     }
   }
 
-  function mergeCSVsExample() {
+  function mergeCSVsExample(directoryPath,outputFilePath) {
     console.log('EXAMPLE: mergeCSVsExample()');
     // Example Usage:
     // const filesToMerge = [
@@ -214,13 +216,13 @@ console.log('all columns',allColumns.values());
     //   'path/to/file2.csv',
     //   'path/to/file3.csv'
     // ];
-    const directoryPath = 'merge'; 
+
     const filesToMerge = getAllFiles(directoryPath, []);
-    const outputFilePath = `mergedResults.csv`;
     mergeCSVs(filesToMerge, outputFilePath);
+    return outputFilePath;
   }
 
-  // mergeCSVsExample();
+
 
   const NO_PRICE = -99;
   function sortAndRankTotalPrices(allTotalPrices, accomLookup) {
@@ -653,19 +655,25 @@ console.log('all columns',allColumns.values());
 
 
 
-  function rescoreCSVsExample() {
+  function rescoreCSVsExample(mergedFile,outputFilePath) {
     console.log('EXAMPLE: rescoreCSVsExample()');
     // Example Usage:
     const filesToMerge = [
-      'mergedModified.csv'
+      mergedFile
     //   ,
     //   'path/to/file2.csv',
     //   'path/to/file3.csv'
     ];
     // const directoryPath = 'merge'; 
     // const filesToMerge = getAllFiles(directoryPath, []);
-    const outputFilePath = `rescoredResults.csv`;
+   // const outputFilePath = `rescoredResults.csv`;
     rescoreCSVs(filesToMerge, outputFilePath);
+    return outputFilePath;
   }
-
-  rescoreCSVsExample();
+  const directoryPath = 'merge3'; 
+  const mergedFile = `allMergedResultsIbagueX.csv`;
+  const rescoredFile = `rescoredResultsIbague.csv`;
+  //const mergedFile = 
+ // mergeCSVsExample(directoryPath,mergedFile);
+  //const mergedFile = 'mergedResults.csv'
+rescoreCSVsExample(mergedFile,rescoredFile);
