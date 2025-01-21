@@ -1311,8 +1311,8 @@ fs.readFile(`${city}.json`, 'utf8', (err, data) => {
   }
 
   function main3(){
-    const city = 'Ibague';
-    const url = 'https://www.airbnb.com/s/Ibagu%C3%A9--Tolima--Colombia/homes?refinement_paths%5B%5D=%2Fhomes&flexible_trip_lengths%5B%5D=one_week&price_filter_input_type=0&channel=EXPLORE&query=Ibagu%C3%A9%2C%20Tolima%2C%20Colombia&place_id=ChIJw4N9lwnEOI4RjnG5Vu4_b-E&date_picker_type=calendar&source=structured_search_input_header&search_type=user_map_move&monthly_start_date=2025-02-01&monthly_length=3&monthly_end_date=2025-05-01&search_mode=regular_search&disable_auto_translation=true&price_filter_num_nights=5&ne_lat=4.524602466779487&ne_lng=-75.1289470499969&sw_lat=4.322800029371973&sw_lng=-75.2831432331482&zoom=12.264138084243688&zoom_level=12.264138084243688&search_by_map=true'
+    const city = 'IbagueMap';
+    const url = 'https://www.airbnb.com/s/Ibagu%C3%A9--Tolima--Colombia/homes?refinement_paths%5B%5D=%2Fhomes&flexible_trip_lengths%5B%5D=one_week&monthly_start_date=2025-02-01&monthly_length=3&monthly_end_date=2025-05-01&price_filter_input_type=0&channel=EXPLORE&query=Ibagu%C3%A9%2C%20Tolima%2C%20Colombia&place_id=ChIJw4N9lwnEOI4RjnG5Vu4_b-E&date_picker_type=calendar&source=structured_search_input_header&search_type=user_map_move&search_mode=regular_search&disable_auto_translation=true&price_filter_num_nights=5&ne_lat=4.460460367175681&ne_lng=-75.19521165784218&sw_lat=4.43524347985258&sw_lng=-75.21448036919978&zoom=15.264573142427325&zoom_level=15.264573142427325&search_by_map=true'
     getAccommodations(city,url).then((groupedData) => {
          // Print the grouped data (optional)
          for (const score in groupedData) {
