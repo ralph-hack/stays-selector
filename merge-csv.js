@@ -506,6 +506,11 @@ console.log('all columns',allColumns.values());
         // }
       }
 //console.log('all columns',allColumns.values());
+// #### DEBUG REMOVE
+//return;
+// #### DEBUG REMOVE
+
+
       // Create a mapping of column names to their index
       const columnMap = {};
       allColumns.forEach((col, index) => {
@@ -523,6 +528,12 @@ console.log('all columns',allColumns.values());
         const newRow = {}; 
         allColumns.forEach(col => {
           newRow[col] = row[col] || null; 
+
+           // ###### DEBUG REMOVE #######
+          if(col===null || col.trim().length===0){
+            console.log('Found: blank column');
+          }
+          // ###### DEBUG REMOVE #######
         });
         if(!accomLookup[newRow.id]){
             if(newRow.nights===0 || !newRow.nights ){
@@ -574,9 +585,9 @@ console.log('all columns',allColumns.values());
 
       
           accommodations.forEach(accom => {
-            // const dict = accom.amenities;
+            //  const dict = accom.amenities;
            
-            // Object.values(dict).forEach(value => uniqueKeys.add(value.title));
+            //  Object.values(dict).forEach(value => uniqueKeys.add(value.title));
             //setPriceRank(accom);
             // tally score
             tallyScores(accom,count);
@@ -604,9 +615,13 @@ console.log('all columns',allColumns.values());
           //const csvString = `id,title,price,rating,ratingString,url,beds,amenities\n` +
       
           //const addHeader = shouldAddHeader??false
+          const myArray = [...allColumns];
+          console.log('last column:',myArray[myArray.length-1])
           const header = //addHeader?
-          `rank,totalRankScore,totalPriceRankScore,nightlyRateScore,reviewRankScore,rareFindScore,acScore,wifiScore,guestFavoriteScore,superhostScore,id,title,dates,totalPrice,totalPriceRank,nightlyRateRank,reviewScore,reviewScoreString,reviewScoreRank,url,nightlyRateDisplay,nights,nightlyTotalDisplay,nightlyTotalDisplayPercent,cleaningFee,airbnbFee,feeTotal,feePercent,beds,${Object.values(uniqueKeyArray).join(',')}\n`;
+         // `rank,totalRankScore,totalPriceRankScore,nightlyRateScore,reviewRankScore,rareFindScore,acScore,wifiScore,guestFavoriteScore,superhostScore,id,title,dates,totalPrice,totalPriceRank,nightlyRateRank,reviewScore,reviewScoreString,reviewScoreRank,url,nightlyRateDisplay,nights,nightlyTotalDisplay,nightlyTotalDisplayPercent,cleaningFee,airbnbFee,feeTotal,feePercent,beds,${Object.values(uniqueKeyArray).join(',')}\n`;
           //:'';
+          //myArray[0]===''?myArray.slice(1).join(', ')+'\n':
+          myArray.join(', ')+'\n';
           const csvString = header +
       
           // accommodations.map((row) =>
@@ -630,7 +645,8 @@ console.log('all columns',allColumns.values());
             // csvRow += `,${Object.values(rest).join(',')}`;
             // csvRow += `,${Object.values(uniqueKeyArray).map(amenityName => amenities[amenityName]?amenities[amenityName].available:'').join(',')}`;
       
-            let csvRow = `${Object.values(accom).join(',')}`;
+             const serializeObj = {subScores,totalScore,...rest} = accom
+            let csvRow = `${Object.values(rest).join(',')}`;
             //csvRow += `,${Object.values(amenities).map(amenity => amenity.available? amenity.title : '').join(',')}`;
             // Object.values(row).join(',');
             return csvRow;
