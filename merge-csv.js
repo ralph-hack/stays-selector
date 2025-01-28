@@ -463,7 +463,7 @@ console.log('all columns',allColumns.values());
       }
       summedScores += score;
       accommodation.totalScore = summedScores;
-      accommodation.subScores[criteria] = score;
+      accommodation.subScores[criteria+"_score"] = score;
       console.log(`Total score for accomodation ${accommodation.id}: ${accommodation.totalScore} sub-scores: ${JSON.stringify(accommodation.subScores)}`);
     });
   }
@@ -528,6 +528,10 @@ console.log('all columns',allColumns.values());
         const newRow = {}; 
         allColumns.forEach(col => {
           newRow[col] = row[col] || null; 
+
+          if(row[col]?.indexOf(',')>-1){
+            newRow[col] = `"${row[col]}"`; // Escape commas
+          }
 
            // ###### DEBUG REMOVE #######
           if(col===null || col.trim().length===0){
@@ -615,13 +619,15 @@ console.log('all columns',allColumns.values());
           //const csvString = `id,title,price,rating,ratingString,url,beds,amenities\n` +
       
           //const addHeader = shouldAddHeader??false
+          const firstAccom = accommodations[0];
+          const subScoreKeys = Object.keys(firstAccom.subScores);
           const myArray = [...allColumns];
           console.log('last column:',myArray[myArray.length-1])
           const header = //addHeader?
          // `rank,totalRankScore,totalPriceRankScore,nightlyRateScore,reviewRankScore,rareFindScore,acScore,wifiScore,guestFavoriteScore,superhostScore,id,title,dates,totalPrice,totalPriceRank,nightlyRateRank,reviewScore,reviewScoreString,reviewScoreRank,url,nightlyRateDisplay,nights,nightlyTotalDisplay,nightlyTotalDisplayPercent,cleaningFee,airbnbFee,feeTotal,feePercent,beds,${Object.values(uniqueKeyArray).join(',')}\n`;
           //:'';
           //myArray[0]===''?myArray.slice(1).join(', ')+'\n':
-          myArray.join(', ')+'\n';
+          myArray.join(', ')+',totalScore,'+subScoreKeys.join(', ')+'\n';
           const csvString = header +
       
           // accommodations.map((row) =>
@@ -646,7 +652,7 @@ console.log('all columns',allColumns.values());
             // csvRow += `,${Object.values(uniqueKeyArray).map(amenityName => amenities[amenityName]?amenities[amenityName].available:'').join(',')}`;
       
              const serializeObj = {subScores,totalScore,...rest} = accom
-            let csvRow = `${Object.values(rest).join(',')}`;
+            let csvRow = `${Object.values(rest).join(',')},${totalScore},${Object.values(subScores)}`;
             //csvRow += `,${Object.values(amenities).map(amenity => amenity.available? amenity.title : '').join(',')}`;
             // Object.values(row).join(',');
             return csvRow;
