@@ -108,7 +108,10 @@ async function mergeCSVs(files, outputFile, options = {}) {
         delimiter: ',', 
         from_line: 1, 
         columns: true ,
-        relax_column_count: true 
+         relax_column_count: true,
+        quote: '"', escape: '"',
+        skip_empty_lines: true ,
+        relax_quotes: true 
       };
       const mergedOptions = { ...defaultOptions, ...options };
   
@@ -153,7 +156,19 @@ console.log('all columns',allColumns.values());
       const transformedData = allData.map(row => {
         const newRow = {}; 
         allColumns.forEach(col => {
+        
           newRow[col] = row[col] || null; 
+
+
+          // ###### DEBUG REMOVE #######
+          // if(row[col]?.indexOf('Fiber Internet in Laureles')>-1){
+          //   console.log('Found: ',newRow[col]);
+          // }
+          // ###### DEBUG REMOVE #######
+
+          if(row[col]?.indexOf(',')>-1){
+            newRow[col] = `"${row[col]}"`; // Escape commas
+          }
         });
         
         return Object.values(newRow); 
@@ -670,10 +685,10 @@ console.log('all columns',allColumns.values());
     rescoreCSVs(filesToMerge, outputFilePath);
     return outputFilePath;
   }
-  const directoryPath = 'merge3'; 
-  const mergedFile = `allMergedResultsIbagueX.csv`;
-  const rescoredFile = `rescoredResultsIbague.csv`;
+  const directoryPath = 'merge2'; 
+  const mergedFile = `allMergedResultsMedellinDebug.csv`;
+  const rescoredFile = `rescoredResultsMedellinDebug.csv`;
   //const mergedFile = 
- // mergeCSVsExample(directoryPath,mergedFile);
+  //mergeCSVsExample(directoryPath,mergedFile);
   //const mergedFile = 'mergedResults.csv'
 rescoreCSVsExample(mergedFile,rescoredFile);
