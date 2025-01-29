@@ -539,8 +539,32 @@ console.log('all columns',allColumns.values());
           }
           // ###### DEBUG REMOVE #######
         });
+
+        if(newRow['totalPrice'] && parseFloat(newRow['totalPrice'])===0 &&
+           newRow['nightlyRateDisplay'] && parseFloat(newRow['nightlyRateDisplay']) >0){
+            console.log('DEBUG: totalPrice === 0 found')
+           const rate = parseFloat(newRow['nightlyRateDisplay'])
+           let nights = 3
+           if(newRow['nights'] && parseFloat(newRow['totalPrice'])>0){
+              nights = parseFloat(newRow['totalPrice'])
+           }
+           const totalPrice = rate * nights * 1.0
+           newRow['totalPrice'] = totalPrice
+           newRow.nights = nights
+           newRow.nightlyTotalDisplay = totalPrice
+        }
+
+        // FIX NEEDED: Not working
+        // if(newRow.nightlyRateDisplay * newRow.nights + (newRow.airbnbFee + newRow.cleaningFee * 1.0) -  newRow.totalPrice > 1 ){
+        //   console.log('DEBUG: nightlyRateDisplay * nights -  totalPrice > 1 found')
+        //   newRow.totalPrice = newRow.nightlyRateDisplay * newRow.nights+ (newRow.airbnbFee + newRow.cleaningFee * 1.0);
+        //   newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
+        //   newRow.feePercent = (newRow.airbnbFee + newRow.cleaningFee * 1.0)/(newRow.totalPrice * 1.0)*100
+        // }
+
         if(!accomLookup[newRow.id]){
             if(newRow.nights===0 || !newRow.nights ){
+              console.log('DEBUG: nights === 0 found')
                 newRow.nights = 3;
                 newRow.totalPrice = newRow.nightlyRateDisplay * newRow.nights;
                 newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
@@ -554,6 +578,45 @@ console.log('all columns',allColumns.values());
         }
         else{
             console.log('DUPE ' + newRow.id);
+            const orig = accomLookup[newRow.id]
+            Object.keys(orig).map(col=>{
+              if(newRow[col] && !orig[col]){
+                console.log(`DEBUG: ${col} is null in orig, but not null in newRow that is dupe`)
+                orig[col] = newRow[col]
+
+                if(col === 'totalPrice'){
+                 const found = allTotalPrices.find(x=>x.id === orig.id)
+                 if(found){
+                  console.log(`DEBUG: Copying ${col} value (${orig.totalPrice}) to allTotalPrices`)
+                   found.value = orig.totalPrice;
+                   found.rank = 0;
+                 }
+                }
+
+                if(col === 'nightlyRateDisplay'){
+                  const found = allNightlyRates.find(x=>x.id === orig.id)
+                  if(found){
+                    console.log(`DEBUG: Copying ${col} value (${orig.allNightlyRates}) to allNightlyRates`)
+                    found.value = orig.allNightlyRates;
+                    found.rank = 0;
+                  }
+                }
+
+                 if(col === 'reviewScore'){
+                  const found = allReviewScores.find(x=>x.id === orig.id)
+                  if(found){
+                    console.log(`DEBUG: Copying ${col} value (${orig.allNightlyRates}) to allReviewScores`)
+                    found.value = parseFloatReviewScore(orig);
+                    found.rank = 0;
+                  }
+                 }
+
+              }
+
+              if(!newRow[col] && orig[col]){
+                newRow[col] = orig[col]
+              }
+            })
             dupeCount++;
         }
         return newRow;
