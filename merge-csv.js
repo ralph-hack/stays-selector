@@ -568,7 +568,7 @@ console.log('all columns',allColumns.values());
         const calc = (newRow.nightlyRateDisplay * newRow.nights) + (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)
         const diff = calc -  newRow.totalPrice
         if( diff > 1 ){
-          console.log('DEBUG: nightlyRateDisplay * nights -  totalPrice > 1 found: diff=' + diff, newRow.totalPrice, calc)
+          console.log('DEBUG: nightlyRateDisplay * nights -  totalPrice > 1 found: diff=' + diff, newRow.totalPrice, calc, newRow.nightlyRateDisplay)
           newRow.totalPrice = calc;
           newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
           newRow.feePercent = (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)/(newRow.totalPrice * 1.0)*100
