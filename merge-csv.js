@@ -558,7 +558,7 @@ console.log('all columns',allColumns.values());
            const totalPrice = rate * nights * 1.0+ (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0);
            newRow['totalPrice'] = totalPrice
            newRow.nights = nights
-           newRow.nightlyTotalDisplay = totalPrice
+           newRow.nightlyTotalDisplay = rate * nights * 1.0
 
           //  console.log('Updated1: ', newRow.totalPrice,newRow.nights, newRow.nightlyRateDisplay, newRow.airbnbFee, newRow.cleaningFee)
           // return
