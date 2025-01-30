@@ -243,7 +243,7 @@ console.log('all columns',allColumns.values());
   function sortAndRankTotalPrices(allTotalPrices, accomLookup) {
     const NO_VALUE = NO_PRICE;
     allTotalPrices.sort((a, b) => a.value - b.value);
-    console.log('allTotalPrices ===> ', allTotalPrices);
+    //console.log('allTotalPrices ===> ', allTotalPrices);
     let currentPriceRank = 1;
     let prevPrice = NO_VALUE;
     const count = allTotalPrices.length;
@@ -269,7 +269,7 @@ console.log('all columns',allColumns.values());
   function sortAndRankNightlyRates(allNightlyRates, accomLookup) {
     const NO_VALUE = NO_PRICE;
     allNightlyRates.sort((a, b) => a.value - b.value);
-    console.log('allNightlyRates ===> ', allNightlyRates);
+    // console.log('allNightlyRates ===> ', allNightlyRates);
     let currentPriceRank = 1;
     let prevPrice = NO_VALUE;
     for (const [index, priceObj] of allNightlyRates.entries()) {
@@ -295,7 +295,7 @@ console.log('all columns',allColumns.values());
   function sortAndRankReviewScores(allReviewScores, accomLookup) {
     const NO_VALUE = NO_RATING;
     allReviewScores.sort((a, b) => b.value - a.value);
-    console.log('allReviewScores ===> ', allReviewScores);
+    // console.log('allReviewScores ===> ', allReviewScores);
     let currentRatingRank = 1;
     let prevRating = NO_VALUE;
     for (const [index, ratingObj] of allReviewScores.entries()) {
@@ -361,7 +361,7 @@ console.log('all columns',allColumns.values());
       rank = getRank(criteria, accommodation, count);
       score = (count + 1 - rank) * weight;
     }
-    console.log(' accommodation: ' + accommodation.id +' criteria: ' + criteria +  ' rank: ' + rank + ' weight: ' + weight +  ' score: ' + score + ' count: ' + count);
+    //console.log(' accommodation: ' + accommodation.id +' criteria: ' + criteria +  ' rank: ' + rank + ' weight: ' + weight +  ' score: ' + score + ' count: ' + count);
     return score < 0 ? 0 : score;
   }
   
@@ -464,7 +464,7 @@ console.log('all columns',allColumns.values());
       summedScores += score;
       accommodation.totalScore = summedScores;
       accommodation.subScores[criteria+"_score"] = score;
-      console.log(`Total score for accomodation ${accommodation.id}: ${accommodation.totalScore} sub-scores: ${JSON.stringify(accommodation.subScores)}`);
+      //console.log(`Total score for accomodation ${accommodation.id}: ${accommodation.totalScore} sub-scores: ${JSON.stringify(accommodation.subScores)}`);
     });
   }
 
@@ -488,6 +488,11 @@ console.log('all columns',allColumns.values());
                 .pipe(parse(mergedOptions))
                 .on('data', (row) => {
                 Object.keys(row).forEach(col =>{
+                     // ###### DEBUG REMOVE #######
+              // if(col===null || col.trim().length===0){
+              //   console.log('Found1: blank column');
+              // }
+              // ###### DEBUG REMOVE #######
                     allColumns.add(col);
                 });
                 results.push(row);
@@ -527,40 +532,49 @@ console.log('all columns',allColumns.values());
       const transformedData = allData.map(row => {
         const newRow = {}; 
         allColumns.forEach(col => {
+              // ###### DEBUG REMOVE #######
+              // if(col===null || col.trim().length===0){
+              //   console.log('Found2: blank column');
+              // }
+              // ###### DEBUG REMOVE #######
+              
           newRow[col] = row[col] || null; 
 
           if(row[col]?.indexOf(',')>-1){
             newRow[col] = `"${row[col]}"`; // Escape commas
           }
 
-           // ###### DEBUG REMOVE #######
-          if(col===null || col.trim().length===0){
-            console.log('Found: blank column');
-          }
-          // ###### DEBUG REMOVE #######
+       
         });
 
         if(newRow['totalPrice'] && parseFloat(newRow['totalPrice'])===0 &&
            newRow['nightlyRateDisplay'] && parseFloat(newRow['nightlyRateDisplay']) >0){
-            console.log('DEBUG: totalPrice === 0 found')
+          //  console.log('DEBUG: totalPrice === 0 found')
            const rate = parseFloat(newRow['nightlyRateDisplay'])
            let nights = 3
            if(newRow['nights'] && parseFloat(newRow['totalPrice'])>0){
               nights = parseFloat(newRow['totalPrice'])
            }
-           const totalPrice = rate * nights * 1.0
+           const totalPrice = rate * nights * 1.0+ (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0);
            newRow['totalPrice'] = totalPrice
            newRow.nights = nights
            newRow.nightlyTotalDisplay = totalPrice
+
+          //  console.log('Updated1: ', newRow.totalPrice,newRow.nights, newRow.nightlyRateDisplay, newRow.airbnbFee, newRow.cleaningFee)
+          // return
         }
 
         // FIX NEEDED: Not working
-        // if(newRow.nightlyRateDisplay * newRow.nights + (newRow.airbnbFee + newRow.cleaningFee * 1.0) -  newRow.totalPrice > 1 ){
-        //   console.log('DEBUG: nightlyRateDisplay * nights -  totalPrice > 1 found')
-        //   newRow.totalPrice = newRow.nightlyRateDisplay * newRow.nights+ (newRow.airbnbFee + newRow.cleaningFee * 1.0);
-        //   newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
-        //   newRow.feePercent = (newRow.airbnbFee + newRow.cleaningFee * 1.0)/(newRow.totalPrice * 1.0)*100
-        // }
+        const calc = (newRow.nightlyRateDisplay * newRow.nights) + (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)
+        const diff = calc -  newRow.totalPrice
+        if( diff > 1 ){
+          console.log('DEBUG: nightlyRateDisplay * nights -  totalPrice > 1 found: diff=' + diff, newRow.totalPrice, calc)
+          newRow.totalPrice = calc;
+          newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
+          newRow.feePercent = (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)/(newRow.totalPrice * 1.0)*100
+          // console.log('Updated2: ', newRow.totalPrice,newRow.nights, newRow.nightlyRateDisplay, newRow.airbnbFee, newRow.cleaningFee)
+          // return
+        }
 
         if(!accomLookup[newRow.id]){
             if(newRow.nights===0 || !newRow.nights ){
@@ -568,7 +582,7 @@ console.log('all columns',allColumns.values());
                 newRow.nights = 3;
                 newRow.totalPrice = newRow.nightlyRateDisplay * newRow.nights;
                 newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
-                newRow.feePercent = (newRow.airbnbFee + newRow.cleaningFee * 1.0)/(newRow.totalPrice * 1.0)*100
+                newRow.feePercent = (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)/(newRow.totalPrice * 1.0)*100
             }
             accommodations.push(newRow);
             accomLookup[newRow.id] = newRow;
@@ -577,26 +591,29 @@ console.log('all columns',allColumns.values());
             allReviewScores.push({ id: newRow.id, value: parseFloatReviewScore(newRow), rank: 0 });
         }
         else{
-            console.log('DUPE ' + newRow.id);
+           // console.log('DUPE ' + newRow.id);
             const orig = accomLookup[newRow.id]
             Object.keys(orig).map(col=>{
               if(newRow[col] && !orig[col]){
-                console.log(`DEBUG: ${col} is null in orig, but not null in newRow that is dupe`)
+               // console.log(`DUPE1: ${col} is null in orig, but not null in newRow that is dupe - setting ${col} to ${newRow[col]}`);
                 orig[col] = newRow[col]
 
                 if(col === 'totalPrice'){
                  const found = allTotalPrices.find(x=>x.id === orig.id)
                  if(found){
-                  console.log(`DEBUG: Copying ${col} value (${orig.totalPrice}) to allTotalPrices`)
+                  console.log(`DUPE2: Copying ${col} value (${orig.totalPrice}) to allTotalPrices`)
                    found.value = orig.totalPrice;
                    found.rank = 0;
+
+                 //  console.log('DUPE3: ', newRow.totalPrice,newRow.nights, newRow.nightlyRateDisplay, newRow.airbnbFee, newRow.cleaningFee)
+         // return
                  }
                 }
 
                 if(col === 'nightlyRateDisplay'){
                   const found = allNightlyRates.find(x=>x.id === orig.id)
                   if(found){
-                    console.log(`DEBUG: Copying ${col} value (${orig.allNightlyRates}) to allNightlyRates`)
+                    console.log(`DUPE3: Copying ${col} value (${orig.allNightlyRates}) to allNightlyRates`)
                     found.value = orig.allNightlyRates;
                     found.rank = 0;
                   }
@@ -605,7 +622,7 @@ console.log('all columns',allColumns.values());
                  if(col === 'reviewScore'){
                   const found = allReviewScores.find(x=>x.id === orig.id)
                   if(found){
-                    console.log(`DEBUG: Copying ${col} value (${orig.allNightlyRates}) to allReviewScores`)
+                    console.log(`DUPE4: Copying ${col} value (${orig.allNightlyRates}) to allReviewScores`)
                     found.value = parseFloatReviewScore(orig);
                     found.rank = 0;
                   }
@@ -615,6 +632,9 @@ console.log('all columns',allColumns.values());
 
               if(!newRow[col] && orig[col]){
                 newRow[col] = orig[col]
+
+               // console.log(`DUPE5: ${col} is null in new, but not null in orig that is dupe - setting ${col} to ${orig[col]}`)
+       //  return
               }
             })
             dupeCount++;
@@ -663,11 +683,11 @@ console.log('all columns',allColumns.values());
       
           // sort by decreasing score - so that max score is first
           allScores.sort((a, b) => b.score - a.score);
-          console.log('allScores ===> ', allScores);
+          //console.log('allScores ===> ', allScores);
           // Convert Set to Array (optional)
-          const uniqueKeyArray = Array.from(uniqueKeys);
+          //const uniqueKeyArray = Array.from(uniqueKeys);
       
-          console.log(uniqueKeyArray); // Output: ['id', 'name', 'age', 'country']
+          //console.log(uniqueKeyArray); // Output: ['id', 'name', 'age', 'country']
       
           // Calculate rank
           accommodations.map((accom) =>{
