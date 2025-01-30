@@ -565,13 +565,15 @@ console.log('all columns',allColumns.values());
         }
 
         // FIX NEEDED: Not working
-        const calc = (newRow.nightlyRateDisplay * newRow.nights) + (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)
+        const nightlyTotal = (newRow.nightlyRateDisplay * newRow.nights)*1.0
+        const calc = nightlyTotal + (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)
         const diff = calc -  newRow.totalPrice
         if( diff > 1 ){
           console.log('DEBUG: nightlyRateDisplay * nights -  totalPrice > 1 found: diff=' + diff, newRow.totalPrice, calc, newRow.nightlyRateDisplay)
           newRow.totalPrice = calc;
           newRow.nightlyTotalDisplayPercent =  newRow.nightlyTotalDisplay / (newRow.totalPrice*1.0)*100
           newRow.feePercent = (parseFloat(newRow.airbnbFee) + parseFloat(newRow.cleaningFee) * 1.0)/(newRow.totalPrice * 1.0)*100
+          newRow.nightlyTotalDisplay = nightlyTotal
           // console.log('Updated2: ', newRow.totalPrice,newRow.nights, newRow.nightlyRateDisplay, newRow.airbnbFee, newRow.cleaningFee)
           // return
         }
